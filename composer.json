@@ -1,0 +1,19 @@
+{
+	"name": "albertofem/rsync-lib",
+	"description": "A simple PHP rsync wrapper library",
+	"keywords": ["rsync library"],
+	"homepage": "http://albertofem.com",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Alberto Fernandez",
+			"email": "albertofem@gmail.com"
+		}
+	],
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"autoload": {
+		"psr-0": { "AFM": "src/" }
+	}
+}
