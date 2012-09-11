@@ -70,6 +70,28 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(compare_directories($this->getSourceDir(), $this->getTargetDir()));
 	}
 
+	public function testRsyncWithSSHConnection()
+	{
+		$config = array(
+			'ssh' => array(
+				'username' => 'test',
+				'host' => 'test.com',
+				'port' => 2342
+			)
+		);
+
+		$rsync = new Rsync($config);
+
+		$command = $rsync->getCommand(".", "/home/test/");
+
+		$actual = $command->getCommand();
+		$expected = "/usr/bin/rsync -La --rsh 'ssh -p '2342'' . test@test.com:/home/test/";
+
+		$this->assertEquals($expected, $actual);
+
+		$this->markTestIncomplete("Tested SSH connection string, but cannot test real SSH connection sync!");
+	}
+
 	public function getTargetDir()
 	{
 		return self::$targetDir;

@@ -43,4 +43,90 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 	{
 		new SSH(array('port' => 'not_a_number'));
 	}
+
+	public function testGetConnectionString()
+	{
+		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com'));
+
+		$actual = $ssh->getConnectionString();
+		$expected = "ssh test@test.com";
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testGetConnectionNonStandardPort()
+	{
+		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com', 'port' => 231));
+
+		$actual = $ssh->getConnectionString();
+		$expected = "ssh -p '231' test@test.com";
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testGetConnectionWithPublicKey()
+	{
+		$publicKey = "./key.pub";
+		$publicKeyWithSpaces = "./key key.pub";
+
+		touch($publicKey);
+		touch($publicKeyWithSpaces);
+
+		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com', 'public_key' => $publicKey));
+
+		$actual = $ssh->getConnectionString();
+		$expected = "ssh -i '" .$publicKey. "' test@test.com";
+
+		$this->assertEquals($expected, $actual);
+
+		$ssh->setPublicKey($publicKeyWithSpaces);
+
+		$actual = $ssh->getConnectionString();
+		$expected = "ssh -i '" .$publicKeyWithSpaces. "' test@test.com";
+
+		$this->assertEquals($expected, $actual);
+
+		unlink($publicKey);
+		unlink($publicKeyWithSpaces);
+	}
+
+	public function testGetHostConnection()
+	{
+		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com'));
+
+		$actual = $ssh->getHostConnection();
+		$expected = "test@test.com";
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testGetConnectionOptions()
+	{
+		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com', 'port' => 231, 'public_key' => '/dev/null'));
+
+		$actual = $ssh->getConnectionOptions();
+		$expected = "ssh -p '231' -i '/dev/null'";
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testGetConnectionNoUsername()
+	{
+		$ssh = new SSH;
+
+		$ssh->getConnectionString();
+	}
+
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testGetConnectionNoHost()
+	{
+		$ssh = new SSH(array('username' => 'test'));
+
+		$ssh->getConnectionString();
+	}
 }

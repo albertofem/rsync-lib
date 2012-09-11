@@ -62,7 +62,14 @@ class Command
 
 		foreach($this->arguments as $argument => $value)
 		{
-			$command[] = "--" . (is_string($value) ? $argument . " '" . $value. "'" : $argument);
+			if(strlen($argument) == 1)
+			{
+				$command[] = "-" . $argument . " '". $value. "'";
+			}
+			else
+			{
+				$command[] = "--" . (is_string($value) || is_int($value) ? $argument . " '" . $value. "'" : $argument);
+			}
 		}
 
 		if(!empty($this->parameters))

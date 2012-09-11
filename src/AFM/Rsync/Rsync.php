@@ -18,26 +18,59 @@ namespace AFM\Rsync;
  */
 class Rsync extends AbstractProtocol
 {
+	/**
+	 * @var string
+	 */
 	protected $executable = "/usr/bin/rsync";
 
+	/**
+	 * @var bool
+	 */
 	protected $followSymLinks = true;
 
+	/**
+	 * @var bool
+	 */
 	protected $dryRun = false;
 
+	/**
+	 * @var array
+	 */
 	protected $optionalParameters = array();
 
+	/**
+	 * @var bool
+	 */
 	protected $verbose = false;
 
+	/**
+	 * @var bool
+	 */
 	protected $deleteFromTarget = false;
 
+	/**
+	 * @var bool
+	 */
 	protected $deleteExcluded = false;
 
+	/**
+	 * @var array
+	 */
 	protected $exclude = array();
 
+	/**
+	 * @var bool
+	 */
 	protected $recursive = true;
 
+	/**
+	 * @var bool
+	 */
 	protected $showOutput = true;
 
+	/**
+	 * @var SSH
+	 */
 	protected $ssh;
 
 	public function __construct(Array $options = array())
@@ -201,8 +234,18 @@ class Rsync extends AbstractProtocol
 		if($this->recursive)
 			$command->addOption("a");
 
+		if(!is_null($this->ssh))
+		{
+			$ssh = $this->ssh->getConnectionOptions();
+			$command->addArgument("rsh", $ssh);
+		}
+
 		$command->addParameter($origin);
-		$command->addParameter($target);
+
+		if(is_null($this->ssh))
+			$command->addParameter($target);
+		else
+			$command->addParameter($this->ssh->getHostConnection() . ":" .$target);
 
 		return $command;
 	}
