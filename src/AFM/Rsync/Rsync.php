@@ -12,7 +12,8 @@
 namespace AFM\Rsync;
 
 /**
- * Rsync wrapper
+ * Rsync wrapper. Many options are not implemented,
+ * but you can use setOptionalParameters
  *
  * @author Alberto Fernández <albertofem@gmail.com>
  */
@@ -73,6 +74,11 @@ class Rsync extends AbstractProtocol
 	 */
 	protected $ssh;
 
+	/**
+	 * Injects and validates config
+	 *
+	 * @param array $options
+	 */
 	public function __construct(Array $options = array())
 	{
 		$this->setOption($options, 'executable', 'setExecutable');
@@ -88,12 +94,25 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'ssh', 'setSshOptions');
 	}
 
+	/**
+	 * @param $options
+	 */
 	public function setSshOptions($options)
 	{
 		if(is_null($this->ssh))
 			$this->ssh = new SSH($options);
 	}
 
+	/**
+	 * Sync $origin directory with $target one.
+	 * If SSH was configured, you must use absolute path
+	 * in the target directory
+	 *
+	 * @param $origin
+	 * @param $target
+	 *
+	 * @throws \InvalidArgumentException If the command failed
+	 */
 	public function sync($origin, $target)
 	{
 		$command = $this->getCommand($origin, $target);
@@ -101,109 +120,168 @@ class Rsync extends AbstractProtocol
 		$command->execute($this->showOutput);
 	}
 
-	public function setExecutable($rsyncLocation)
-	{
-		if(!is_executable($rsyncLocation))
-			throw new \InvalidArgumentException("Rsync location '". $rsyncLocation. "' is invalid");
-
-		$this->executable = $rsyncLocation;
-	}
-
+	/**
+	 * @return string
+	 */
 	public function getExecutable()
 	{
 		return $this->executable;
 	}
 
+	/**
+	 * @param $followSymLinks
+	 */
 	public function setFollowSymLinks($followSymLinks)
 	{
 		$this->followSymLinks = $followSymLinks;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getFollowSymLinks()
 	{
 		return $this->followSymLinks;
 	}
 
+	/**
+	 * @param $dryRun
+	 */
 	public function setDryRun($dryRun)
 	{
 		$this->dryRun = $dryRun;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getDryRun()
 	{
 		return $this->dryRun;
 	}
 
+	/**
+	 * @param $optionalParameters
+	 */
 	public function setOptionalParameters($optionalParameters)
 	{
 		$this->optionalParameters = $optionalParameters;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getOptionalParameters()
 	{
 		return $this->optionalParameters;
 	}
 
+	/**
+	 * @param $verbose
+	 */
 	public function setVerbose($verbose)
 	{
 		$this->verbose = $verbose;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getVerbose()
 	{
 		return $this->verbose;
 	}
 
+	/**
+	 * @param $deleteExcluded
+	 */
 	public function setDeleteExcluded($deleteExcluded)
 	{
 		$this->deleteExcluded = $deleteExcluded;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getDeleteExcluded()
 	{
 		return $this->deleteExcluded;
 	}
 
+	/**
+	 * @param $deleteFromTarget
+	 */
 	public function setDeleteFromTarget($deleteFromTarget)
 	{
 		$this->deleteFromTarget = $deleteFromTarget;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getDeleteFromTarget()
 	{
 		return $this->deleteFromTarget;
 	}
 
+	/**
+	 * @param $exclude
+	 */
 	public function setExclude($exclude)
 	{
 		$this->exclude = $exclude;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getExclude()
 	{
 		return $this->exclude;
 	}
 
+	/**
+	 * @param $recursive
+	 */
 	public function setRecursive($recursive)
 	{
 		$this->recursive = $recursive;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getRecursive()
 	{
 		return $this->recursive;
 	}
 
+	/**
+	 * @param $showOutput
+	 */
 	public function setShowOutput($showOutput)
 	{
 		$this->showOutput = $showOutput;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getShowOutput()
 	{
 		return $this->showOutput;
 	}
 
+	/**
+	 * Gets command generated for this current
+	 * rsync configuration. You can use it to test
+	 * or execute it later without using the sync method
+	 *
+	 * @param $origin
+	 * @param $target
+	 *
+	 * @return Command
+	 */
 	public function getCommand($origin, $target)
 	{
 		$command = new Command($this->executable);

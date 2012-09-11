@@ -48,7 +48,7 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 	{
 		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com'));
 
-		$actual = $ssh->getConnectionString();
+		$actual = $ssh->getCommand();
 		$expected = "ssh test@test.com";
 
 		$this->assertEquals($expected, $actual);
@@ -58,7 +58,7 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 	{
 		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com', 'port' => 231));
 
-		$actual = $ssh->getConnectionString();
+		$actual = $ssh->getCommand();
 		$expected = "ssh -p '231' test@test.com";
 
 		$this->assertEquals($expected, $actual);
@@ -74,14 +74,14 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 
 		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com', 'public_key' => $publicKey));
 
-		$actual = $ssh->getConnectionString();
+		$actual = $ssh->getCommand();
 		$expected = "ssh -i '" .$publicKey. "' test@test.com";
 
 		$this->assertEquals($expected, $actual);
 
 		$ssh->setPublicKey($publicKeyWithSpaces);
 
-		$actual = $ssh->getConnectionString();
+		$actual = $ssh->getCommand();
 		$expected = "ssh -i '" .$publicKeyWithSpaces. "' test@test.com";
 
 		$this->assertEquals($expected, $actual);
@@ -117,7 +117,7 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 	{
 		$ssh = new SSH;
 
-		$ssh->getConnectionString();
+		$ssh->getCommand();
 	}
 
 	/**
@@ -127,6 +127,6 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 	{
 		$ssh = new SSH(array('username' => 'test'));
 
-		$ssh->getConnectionString();
+		$ssh->getCommand();
 	}
 }

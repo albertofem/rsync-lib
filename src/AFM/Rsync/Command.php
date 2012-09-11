@@ -11,48 +11,120 @@
 
 namespace AFM\Rsync;
 
+/**
+ * Command abstraction class, construct commands
+ * using arguments options and parameters
+ *
+ * Command format:
+ * <pre>
+ * 		[executable] [-abLs](options) [-a value](argument) [--test value](argument) [parameter1] ... [parameterN]
+ * </pre>
+ *
+ * @author Alberto <albertofem@gmail.com>
+ */
 class Command
 {
+	/**
+	 * @var string
+	 */
 	private $executable;
 
+	/**
+	 * @var array
+	 */
 	private $options = array();
 
+	/**
+	 * @var array
+	 */
 	private $arguments = array();
 
+	/**
+	 * @var string
+	 */
 	private $command;
 
+	/**
+	 * @var array
+	 */
 	private $parameters = array();
 
-	public function __construct($executable = "")
+	/**
+	 * Every command must have an executable
+	 *
+	 * @param $executable
+	 */
+	public function __construct($executable)
 	{
 		$this->executable = $executable;
 	}
 
+	/**
+	 * Adds a parameter to the command, will be appended
+	 * in the same order as insertion at the end
+	 *
+	 * @param $parameter
+	 */
 	public function addParameter($parameter)
 	{
 		$this->parameters[] = $parameter;
 	}
 
+	/**
+	 * Adds an option to the command, will be
+	 * appended to the command in the next format:
+	 *
+	 * <pre>
+	 * 		-aBLs
+	 * </pre>
+	 *
+	 * @param $option
+	 */
 	public function addOption($option)
 	{
 		$this->options[] = $option;
 	}
 
+	/**
+	 * Adds an argument to the command. If the argument
+	 * is more than one letter, "-- " will be appended before
+	 * if not, it will act as an option with a value:
+	 *
+	 * <pre>
+	 * 		--argument [value]
+	 * 		-p [value]
+	 * </pre>
+	 *
+	 * @param $name
+	 * @param bool $value
+	 */
 	public function addArgument($name, $value = true)
 	{
 		$this->arguments[$name] = $value;
 	}
 
+	/**
+	 * @param $executable
+	 */
 	public function setExecutable($executable)
 	{
 		$this->executable = $executable;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getExecutable()
 	{
 		return $this->executable;
 	}
 
+	/**
+	 * Constructs the command appendind options,
+	 * arguments, executable and parameters
+	 *
+	 * @return string
+	 */
 	protected function constructCommand()
 	{
 		$command[] = $this->executable;
@@ -80,6 +152,11 @@ class Command
 		return $stringCommand;
 	}
 
+	/**
+	 * Gets the command string
+	 *
+	 * @return mixed
+	 */
 	public function getCommand()
 	{
 		if(is_null($this->command))
@@ -88,11 +165,20 @@ class Command
 		return $this->command;
 	}
 
+	/**
+	 * @see getCommand
+	 * @return mixed
+	 */
 	public function __toString()
 	{
 		return $this->getCommand();
 	}
 
+	/**
+	 * Execute command, with optional output printer
+	 *
+	 * @param bool $showOutput
+	 */
 	public function execute($showOutput = false)
 	{
 		$this->getCommand();
@@ -103,6 +189,11 @@ class Command
 			shell_exec($this->command);
 	}
 
+	/**
+	 * Execute and buffers command result to print it
+	 *
+	 * @throws \InvalidArgumentException When the command couldn't be executed
+	 */
 	private function executeWithOutput()
 	{
 		if(($fp = popen($this->command, "r")))
