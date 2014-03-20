@@ -27,6 +27,11 @@ class Rsync extends AbstractProtocol
 	/**
 	 * @var bool
 	 */
+	protected $skipNewerFiles = false;
+
+	/**
+	 * @var bool
+	 */
 	protected $followSymLinks = true;
 
 	/**
@@ -82,6 +87,7 @@ class Rsync extends AbstractProtocol
 	public function __construct(Array $options = array())
 	{
 		$this->setOption($options, 'executable', 'setExecutable');
+		$this->setOption($options, 'update', 'setSkipNewerFiles');
 		$this->setOption($options, 'follow_symlinks', 'setFollowSymLinks');
 		$this->setOption($options, 'dry_run', 'setDryRun');
 		$this->setOption($options, 'option_parameters', 'setOptionalParameters');
@@ -128,6 +134,22 @@ class Rsync extends AbstractProtocol
 		return $this->executable;
 	}
 
+	/**
+	 * @param $skipNewerFiles
+	 */
+	public function setSkipNewerFiles($skipNewerFiles)
+	{
+		$this->skipNewerFiles = $skipNewerFiles;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getSkipNewerFiles()
+	{
+		return $this->skipNewerFiles;
+	}
+	
 	/**
 	 * @param $followSymLinks
 	 */
@@ -285,6 +307,9 @@ class Rsync extends AbstractProtocol
 	public function getCommand($origin, $target)
 	{
 		$command = new Command($this->executable);
+
+		if($this->skipNewerFiles)
+			$command->addOption("u");
 
 		if($this->followSymLinks)
 			$command->addOption("L");
