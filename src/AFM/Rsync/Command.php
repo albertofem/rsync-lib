@@ -100,7 +100,7 @@ class Command
 	 */
 	public function addArgument($name, $value = true)
 	{
-		$this->arguments[$name] = $value;
+		$this->arguments[$name][] = $value;
 	}
 
 	/**
@@ -132,15 +132,18 @@ class Command
 		if(!empty($this->options))
 			$command[] = "-" . implode($this->options);
 
-		foreach($this->arguments as $argument => $value)
+		foreach($this->arguments as $argument => $values)
 		{
-			if(strlen($argument) == 1)
+			foreach($values as $value)
 			{
-				$command[] = "-" . $argument . " '". $value. "'";
-			}
-			else
-			{
-				$command[] = "--" . (is_string($value) || is_int($value) ? $argument . " '" . $value. "'" : $argument);
+				if(strlen($argument) == 1)
+				{
+					$command[] = "-" . $argument . " '". $value. "'";
+				}
+				else
+				{
+					$command[] = "--" . (is_string($value) || is_int($value) ? $argument . " '" . $value. "'" : $argument);
+				}
 			}
 		}
 
