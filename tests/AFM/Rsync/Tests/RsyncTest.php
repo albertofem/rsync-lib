@@ -114,6 +114,17 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testRsyncWithTimes()
+	{
+		$rsync = new Rsync();
+		$rsync->setTimes(true);
+
+		$expected = "/usr/bin/rsync -La --times /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function getTargetDir()
 	{
 		return self::$targetDir;
