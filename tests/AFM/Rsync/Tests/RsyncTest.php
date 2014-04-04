@@ -92,6 +92,28 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$this->markTestIncomplete("Tested SSH connection string, but cannot test real SSH connection sync!");
 	}
 
+	public function testRsyncWithSingleExclude()
+	{
+		$rsync = new Rsync();
+		$rsync->setExclude(array('exclude1'));
+
+		$expected = "/usr/bin/rsync -La --exclude 'exclude1' /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testRsyncWithMultipleExcludes()
+	{
+		$rsync = new Rsync();
+		$rsync->setExclude(array('exclude1', 'exclude2', 'exclude3'));
+
+		$expected = "/usr/bin/rsync -La --exclude 'exclude1' --exclude 'exclude2' --exclude 'exclude3' /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function getTargetDir()
 	{
 		return self::$targetDir;
