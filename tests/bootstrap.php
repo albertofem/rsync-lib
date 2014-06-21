@@ -12,7 +12,6 @@
 $loader = require __DIR__ . '/../vendor/autoload.php';
 $loader->add('AFM\Rsync\Tests', __DIR__);
 
-
 /**
  * http://www.php.net/manual/en/function.rmdir.php#108113
  */

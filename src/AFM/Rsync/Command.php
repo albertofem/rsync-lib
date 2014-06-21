@@ -96,7 +96,7 @@ class Command
 	 * </pre>
 	 *
 	 * @param $name
-	 * @param bool $value
+	 * @param bool|mixed $value
 	 */
 	public function addArgument($name, $value = true)
 	{
@@ -127,6 +127,7 @@ class Command
 	 */
 	protected function constructCommand()
 	{
+        $command = array();
 		$command[] = $this->executable;
 
 		if(!empty($this->options))

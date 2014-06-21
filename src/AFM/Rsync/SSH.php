@@ -81,8 +81,8 @@ class SSH extends AbstractProtocol
 	 */
 	public function setPort($port)
 	{
-		if(!is_numeric($port))
-			throw new \InvalidArgumentException("SSH port must be numeric");
+		if(!is_int($port))
+			throw new \InvalidArgumentException("SSH port must be an integer");
 
 		$this->port = $port;
 	}
