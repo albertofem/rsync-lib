@@ -17,29 +17,24 @@ $loader->add('AFM\Rsync\Tests', __DIR__);
  */
 function rrmdir($dir)
 {
-	foreach(glob($dir . '/*') as $file)
-	{
-		if(is_dir($file))
-		{
-			rrmdir($file);
-		}
-		else
-		{
-			unlink($file);
-		}
-	}
+    foreach (glob($dir . '/*') as $file) {
+        if (is_dir($file)) {
+            rrmdir($file);
+        } else {
+            unlink($file);
+        }
+    }
 
-	rmdir($dir);
+    rmdir($dir);
 }
 
 function compare_directories($dir1, $dir2)
 {
-	$output = shell_exec("diff --brief " . $dir1 . " " . $dir2 . " 2>&1");
+    $output = shell_exec("diff --brief " . $dir1 . " " . $dir2 . " 2>&1");
 
-	if(strlen($output) > 0)
-	{
-		return false;
-	}
+    if (strlen($output) > 0) {
+        return false;
+    }
 
-	return true;
+    return true;
 }
