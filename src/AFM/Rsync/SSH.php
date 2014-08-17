@@ -52,6 +52,7 @@ class SSH extends AbstractProtocol
 	 */
 	public function __construct(Array $options = array())
 	{
+		$this->setOption($options, 'executable', 'setExecutable');
 		$this->setOption($options, 'host', 'setHost');
 		$this->setOption($options, 'port', 'setPort');
 		$this->setOption($options, 'username', 'setUsername');
