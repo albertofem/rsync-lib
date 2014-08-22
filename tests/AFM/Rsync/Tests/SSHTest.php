@@ -129,4 +129,15 @@ class SSHTest extends \PHPUnit_Framework_TestCase
 
 		$ssh->getCommand();
 	}
+
+	public function testSetExecutable()
+	{
+  		$ssh = new SSH(array('username' => 'test', 'host' => 'test.com', 'port' => 231, 'executable' => 'c:/cygwin/bin/ssh.exe'));
+
+	        $actual   = $ssh->getConnectionOptions();
+	        $expected = "c:/cygwin/bin/ssh.exe -p '231'";
+
+        	$this->assertEquals($expected, $actual);
+	}
 }
+
