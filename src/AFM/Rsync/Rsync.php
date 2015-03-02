@@ -70,6 +70,11 @@ class Rsync extends AbstractProtocol
 	protected $exclude = array();
 
 	/**
+	 * @var string
+	 */
+	protected $excludeFrom = null;
+
+	/**
 	 * @var bool
 	 */
 	protected $recursive = true;
@@ -106,6 +111,7 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'delete_from_target', 'setDeleteFromTarget');
 		$this->setOption($options, 'delete_excluded', 'setDeleteExcluded');
 		$this->setOption($options, 'exclude', 'setExclude');
+		$this->setOption($options, 'excludeFrom', 'setExcludeFrom');
 		$this->setOption($options, 'recursive', 'setRecursive');
 		$this->setOption($options, 'times', 'setTimes');
 		$this->setOption($options, 'show_output', 'setShowOutput');
@@ -291,6 +297,22 @@ class Rsync extends AbstractProtocol
 	}
 
 	/**
+	 * @param $exclude
+	 */
+	public function setExcludeFrom($excludeFrom)
+	{
+		$this->excludeFrom = $excludeFrom;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getExcludeFrom()
+	{
+		return $this->excludeFrom;
+	}
+
+	/**
 	 * @param $recursive
 	 */
 	public function setRecursive($recursive)
@@ -379,6 +401,11 @@ class Rsync extends AbstractProtocol
 			{
 				$command->addArgument('exclude', $excluded);
 			}
+		}
+
+		if(!empty($this->excludeFrom))
+		{
+			$command->addArgument('exclude-from', $this->excludeFrom);
 		}
 
 		if($this->archive)
