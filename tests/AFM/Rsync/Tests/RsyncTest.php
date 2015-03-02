@@ -114,6 +114,17 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testRsyncWithExcludeFrom()
+	{
+		$rsync = new Rsync();
+		$rsync->setExcludeFrom('rsync_exclude.txt');
+
+		$expected = "/usr/bin/rsync -La --exclude-from 'rsync_exclude.txt' /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function testRsyncWithTimes()
 	{
 		$rsync = new Rsync();
