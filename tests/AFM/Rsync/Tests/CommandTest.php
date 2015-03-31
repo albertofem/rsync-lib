@@ -15,91 +15,91 @@ use AFM\Rsync\Command;
 
 class CommandTest extends \PHPUnit_Framework_TestCase
 {
-	public function testCommandWithOnlyOptions()
-	{
-		$command = new Command("test");
+    public function testCommandWithOnlyOptions()
+    {
+        $command = new Command("test");
 
-		$command->addOption("a");
+        $command->addOption("a");
 
-		$actual = $command->getCommand();
-		$expected = "test -a";
+        $actual = $command->getCommand();
+        $expected = "test -a";
 
-		$this->assertEquals($expected, $actual);
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testCommandWithMultipleOptions()
-	{
-		$command = new Command("test");
+    public function testCommandWithMultipleOptions()
+    {
+        $command = new Command("test");
 
-		$command->addOption("a");
-		$command->addOption("b");
+        $command->addOption("a");
+        $command->addOption("b");
 
-		$actual = $command->getCommand();
-		$expected = "test -ab";
+        $actual = $command->getCommand();
+        $expected = "test -ab";
 
-		$this->assertEquals($expected, $actual);
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testCommandWithOnlyOneParameter()
-	{
-		$command = new Command("test");
+    public function testCommandWithOnlyOneParameter()
+    {
+        $command = new Command("test");
 
-		$command->addParameter("test");
+        $command->addParameter("test");
 
-		$actual = $command->getCommand();
-		$expected = "test test";
+        $actual = $command->getCommand();
+        $expected = "test test";
 
-		$this->assertEquals($expected, $actual);
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testCommandWithOneOptionAndOneParameter()
-	{
-		$command = new Command("test");
+    public function testCommandWithOneOptionAndOneParameter()
+    {
+        $command = new Command("test");
 
-		$command->addOption("a");
-		$command->addParameter("test");
+        $command->addOption("a");
+        $command->addParameter("test");
 
-		$actual = $command->getCommand();
-		$expected = "test -a test";
+        $actual = $command->getCommand();
+        $expected = "test -a test";
 
-		$this->assertEquals($expected, $actual);
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testCommandWithOneOptionAndMultipleParameters()
-	{
-		$command = new Command("test");
+    public function testCommandWithOneOptionAndMultipleParameters()
+    {
+        $command = new Command("test");
 
-		$command->addOption("a");
-		$command->addParameter("test");
-		$command->addParameter("test2");
+        $command->addOption("a");
+        $command->addParameter("test");
+        $command->addParameter("test2");
 
-		$actual = $command->getCommand();
-		$expected = "test -a test test2";
+        $actual = $command->getCommand();
+        $expected = "test -a test test2";
 
-		$this->assertEquals($expected, $actual);
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testCommandWithOnlyOneSimpleArgument()
-	{
-		$command = new Command("test");
+    public function testCommandWithOnlyOneSimpleArgument()
+    {
+        $command = new Command("test");
 
-		$command->addArgument("test");
+        $command->addArgument("test");
 
-		$actual = $command->getCommand();
-		$expected = "test --test";
+        $actual = $command->getCommand();
+        $expected = "test --test";
 
-		$this->assertEquals($expected, $actual);
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testCommandWithOnlyOneArgument()
-	{
-		$command = new Command("test");
+    public function testCommandWithOnlyOneArgument()
+    {
+        $command = new Command("test");
 
-		$command->addArgument("test", "value");
+        $command->addArgument("test", "value");
 
-		$actual = $command->getCommand();
-		$expected = "test --test 'value'";
+        $actual = $command->getCommand();
+        $expected = "test --test 'value'";
 
-		$this->assertEquals($expected, $actual);
-	}
+        $this->assertEquals($expected, $actual);
+    }
 }
