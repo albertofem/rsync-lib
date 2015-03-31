@@ -17,6 +17,8 @@
         "phpunit/phpunit":"~4.1"
     },
 	"autoload": {
-		"psr-0": { "AFM": "src/" }
+		"psr-4": {
+            "AFM\\Rsync\\": "src/"
+        }
 	}
 }
