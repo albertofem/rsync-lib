@@ -90,6 +90,11 @@ class Rsync extends AbstractProtocol
 	protected $showOutput = true;
 
 	/**
+	 * @var bool
+	 */
+	protected $compression = false;
+
+	/**
 	 * @var SSH
 	 */
 	protected $ssh;
@@ -361,6 +366,24 @@ class Rsync extends AbstractProtocol
 	}
 
 	/**
+	 * @param $compression
+	 */
+	public function setCompression($compression)
+	{
+		$this->compression = $compression;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getCompression()
+	{
+		return $this->compression;
+	}
+
+
+
+	/**
 	 * Gets command generated for this current
 	 * rsync configuration. You can use it to test
 	 * or execute it later without using the sync method
@@ -385,6 +408,9 @@ class Rsync extends AbstractProtocol
 
 		if($this->verbose)
 			$command->addOption("v");
+
+		if($this->compression)
+			$command->addOption("z");
 
 		if($this->times)
 			$command->addArgument('times');

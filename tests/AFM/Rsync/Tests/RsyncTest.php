@@ -136,6 +136,17 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testRsyncWithCompression()
+	{
+		$rsync = new Rsync();
+		$rsync->setCompression(true);
+
+		$expected = "/usr/bin/rsync -Lza /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function getTargetDir()
 	{
 		return self::$targetDir;
