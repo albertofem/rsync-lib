@@ -121,6 +121,7 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'times', 'setTimes');
 		$this->setOption($options, 'show_output', 'setShowOutput');
 		$this->setOption($options, 'ssh', 'setSshOptions');
+		$this->setOption($options, 'compression', 'setCompression');
 	}
 
 	/**
