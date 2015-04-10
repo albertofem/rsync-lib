@@ -413,6 +413,24 @@ class Rsync extends AbstractProtocol
 		if($this->compression)
 			$command->addOption("z");
 
+		// add any optional options we've specified
+		$extra_options = $this->getOptionalParameters();
+		if(!empty($extra_options))
+		{
+			// if the extra options were given as a flat string, then convert it to an array
+			if (is_string($extra_options))
+				$extra_options = str_split($extra_options);
+
+			// add each extra option we've defined.
+			if (is_array($extra_options))
+			{
+				foreach($extra_options as $option)
+				{
+					$command->addOption($option);
+				}
+			}
+		}
+
 		if($this->times)
 			$command->addArgument('times');
 
