@@ -90,6 +90,11 @@ class Rsync extends AbstractProtocol
 	protected $showOutput = true;
 
 	/**
+	 * @var bool
+	 */
+	protected $compression = false;
+
+	/**
 	 * @var SSH
 	 */
 	protected $ssh;
@@ -116,6 +121,7 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'times', 'setTimes');
 		$this->setOption($options, 'show_output', 'setShowOutput');
 		$this->setOption($options, 'ssh', 'setSshOptions');
+		$this->setOption($options, 'compression', 'setCompression');
 	}
 
 	/**
@@ -361,6 +367,24 @@ class Rsync extends AbstractProtocol
 	}
 
 	/**
+	 * @param $compression
+	 */
+	public function setCompression($compression)
+	{
+		$this->compression = $compression;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getCompression()
+	{
+		return $this->compression;
+	}
+
+
+
+	/**
 	 * Gets command generated for this current
 	 * rsync configuration. You can use it to test
 	 * or execute it later without using the sync method
@@ -385,6 +409,27 @@ class Rsync extends AbstractProtocol
 
 		if($this->verbose)
 			$command->addOption("v");
+
+		if($this->compression)
+			$command->addOption("z");
+
+		// add any optional options we've specified
+		$extra_options = $this->getOptionalParameters();
+		if(!empty($extra_options))
+		{
+			// if the extra options were given as a flat string, then convert it to an array
+			if (is_string($extra_options))
+				$extra_options = str_split($extra_options);
+
+			// add each extra option we've defined.
+			if (is_array($extra_options))
+			{
+				foreach($extra_options as $option)
+				{
+					$command->addOption($option);
+				}
+			}
+		}
 
 		if($this->times)
 			$command->addArgument('times');

@@ -33,9 +33,10 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
 		$command->addOption("a");
 		$command->addOption("b");
+		$command->addOption("z");
 
 		$actual = $command->getCommand();
-		$expected = "test -ab";
+		$expected = "test -abz";
 
 		$this->assertEquals($expected, $actual);
 	}
