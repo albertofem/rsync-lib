@@ -93,6 +93,11 @@ class Rsync extends AbstractProtocol
 	 * @var bool
 	 */
 	protected $compression = false;
+	
+	/**
+	 * @var bool
+	 */
+	protected $remoteOrigin = false;
 
 	/**
 	 * @var SSH
@@ -122,6 +127,7 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'show_output', 'setShowOutput');
 		$this->setOption($options, 'ssh', 'setSshOptions');
 		$this->setOption($options, 'compression', 'setCompression');
+		$this->setOption($options, 'remote_origin', 'setRemoteOrigin');
 	}
 
 	/**
@@ -381,7 +387,22 @@ class Rsync extends AbstractProtocol
 	{
 		return $this->compression;
 	}
+	
+	/**
+	 * @param $remoteOrigin
+	 */
+	public function setRemoteOrigin($remoteOrigin)
+	{
+		$this->remoteOrigin = (bool) $remoteOrigin;
+	}
 
+	/**
+	 * @return bool
+	 */
+	public function getRemoteOrigin()
+	{
+		return $this->remoteOrigin;
+	}
 
 
 	/**
@@ -465,12 +486,21 @@ class Rsync extends AbstractProtocol
 			$command->addArgument("rsh", $ssh);
 		}
 
-		$command->addParameter($origin);
-
 		if(is_null($this->ssh))
+		{
+			$command->addParameter($origin);
 			$command->addParameter($target);
+		}	
+		elseif($this->remoteOrigin)
+		{
+			$command->addParameter($this->ssh->getHostConnection() . ":" .$origin);
+			$command->addParameter($target);
+		}
 		else
+		{
+			$command->addParameter($origin);
 			$command->addParameter($this->ssh->getHostConnection() . ":" .$target);
+		}
 
 		return $command;
 	}
