@@ -93,11 +93,21 @@ class Rsync extends AbstractProtocol
 	 * @var bool
 	 */
 	protected $compression = false;
-	
+
 	/**
 	 * @var bool
 	 */
 	protected $remoteOrigin = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $removeSource = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $info = false;
 
 	/**
 	 * @var SSH
@@ -128,6 +138,8 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'ssh', 'setSshOptions');
 		$this->setOption($options, 'compression', 'setCompression');
 		$this->setOption($options, 'remote_origin', 'setRemoteOrigin');
+		$this->setOption($options, 'remove_source', 'setRemoveSource');
+		$this->setOption($options, 'info', 'setInfo');
 	}
 
 	/**
@@ -195,7 +207,7 @@ class Rsync extends AbstractProtocol
 	{
 		return $this->skipNewerFiles;
 	}
-	
+
 	/**
 	 * @param $followSymLinks
 	 */
@@ -387,7 +399,7 @@ class Rsync extends AbstractProtocol
 	{
 		return $this->compression;
 	}
-	
+
 	/**
 	 * @param $remoteOrigin
 	 */
@@ -404,6 +416,37 @@ class Rsync extends AbstractProtocol
 		return $this->remoteOrigin;
 	}
 
+	/**
+	 * @param $removeSource
+	 */
+	public function setRemoveSource($removeSource)
+	{
+		$this->removeSource = (bool) $removeSource;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getRemoveSource()
+	{
+		return $this->removeSource;
+	}
+
+	/**
+	 * @param $info
+	 */
+	public function setInfo($info)
+	{
+		$this->info = $info;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getInfo()
+	{
+		return $this->info;
+	}
 
 	/**
 	 * Gets command generated for this current
@@ -458,8 +501,14 @@ class Rsync extends AbstractProtocol
 		if($this->deleteFromTarget)
 			$command->addArgument('delete');
 
+		if($this->removeSource)
+			$command->addArgument('remove-source-files');
+
 		if($this->deleteExcluded)
 			$command->addArgument('delete-excluded');
+
+		if($this->info)
+			$command->addArgument('info', $this->info);
 
 		if(!empty($this->exclude))
 		{
@@ -490,7 +539,7 @@ class Rsync extends AbstractProtocol
 		{
 			$command->addParameter($origin);
 			$command->addParameter($target);
-		}	
+		}
 		elseif($this->remoteOrigin)
 		{
 			$command->addParameter($this->ssh->getHostConnection() . ":" .$origin);
