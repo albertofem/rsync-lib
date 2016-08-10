@@ -170,7 +170,7 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$rsync = new Rsync();
 		$rsync->setInfo('all0');
 
-		$expected = "/usr/bin/rsync -Lza --info 'all0' /origin /target";
+		$expected = "/usr/bin/rsync -La --info 'all0' /origin /target";
 		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
 		$this->assertEquals($expected, $actual);
@@ -181,7 +181,7 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$rsync = new Rsync();
 		$rsync->setRemoveSource(true);
 
-		$expected = "/usr/bin/rsync -Lza --remove-source-files /origin /target";
+		$expected = "/usr/bin/rsync -La --remove-source-files /origin /target";
 		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
 		$this->assertEquals($expected, $actual);
