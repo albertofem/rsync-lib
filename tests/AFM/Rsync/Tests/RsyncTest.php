@@ -165,6 +165,28 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
 	}
 
+	public function testRsyncWithInfo()
+	{
+		$rsync = new Rsync();
+		$rsync->setInfo('all0');
+
+		$expected = "/usr/bin/rsync -La --info 'all0' /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testRsyncWithRemoveSourceFile()
+	{
+		$rsync = new Rsync();
+		$rsync->setRemoveSource(true);
+
+		$expected = "/usr/bin/rsync -La --remove-source-files /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function getTargetDir()
 	{
 		return self::$targetDir;
