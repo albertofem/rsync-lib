@@ -176,6 +176,17 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
+    public function testRsyncWithCompareDest()
+    {
+        $rsync = new Rsync();
+        $rsync->setCompareDest('/Path/To/File');
+
+        $expected = "/usr/bin/rsync -La --compare-dest '/Path/To/File' /origin /target";
+        $actual   = $rsync->getCommand('/origin', '/target')->getCommand();
+
+        $this->assertEquals($expected, $actual);
+    }
+
 	public function testRsyncWithRemoveSourceFile()
 	{
 		$rsync = new Rsync();

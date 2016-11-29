@@ -109,6 +109,11 @@ class Rsync extends AbstractProtocol
 	 */
 	protected $info = false;
 
+    /**
+     * @var bool
+     */
+    protected $compareDest = false;
+
 	/**
 	 * @var SSH
 	 */
@@ -140,6 +145,7 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'remote_origin', 'setRemoteOrigin');
 		$this->setOption($options, 'remove_source', 'setRemoveSource');
 		$this->setOption($options, 'info', 'setInfo');
+        $this->setOption($options, 'compare_dest', 'setCompareDest');
 	}
 
 	/**
@@ -448,6 +454,22 @@ class Rsync extends AbstractProtocol
 		return $this->info;
 	}
 
+    /**
+     * @param $dest
+     */
+    public function setCompareDest($dest)
+    {
+        $this->compareDest = $dest;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompareDest()
+    {
+        return $this->compareDest;
+    }
+
 	/**
 	 * Gets command generated for this current
 	 * rsync configuration. You can use it to test
@@ -509,6 +531,9 @@ class Rsync extends AbstractProtocol
 
 		if($this->info)
 			$command->addArgument('info', $this->info);
+
+        if ($this->compareDest)
+            $command->addArgument('compare-dest', $this->compareDest);
 
 		if(!empty($this->exclude))
 		{
