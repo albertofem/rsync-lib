@@ -115,6 +115,11 @@ class Rsync extends AbstractProtocol
 	protected $compareDest = false;
 
 	/**
+	 * @var bool
+	 */
+	protected $pruneEmptyDirs = false;
+
+	/**
 	 * @var SSH
 	 */
 	protected $ssh;
@@ -146,6 +151,7 @@ class Rsync extends AbstractProtocol
 		$this->setOption($options, 'remove_source', 'setRemoveSource');
 		$this->setOption($options, 'info', 'setInfo');
 		$this->setOption($options, 'compare_dest', 'setCompareDest');
+		$this->setOption($options, 'prune_empty_dirs', 'setPruneEmptyDirs');
 	}
 
 	/**
@@ -197,6 +203,23 @@ class Rsync extends AbstractProtocol
 	{
 		$this->archive = $archive;
 	}
+
+    /**
+	 * @return bool
+	 */
+    public function getPruneEmptyDirs()
+    {
+        return $this->pruneEmptyDirs;
+    }
+
+    /**
+	 * @param $pruneEmptyDirs
+	 */
+    public function setPruneEmptyDirs($pruneEmptyDirs)
+    {
+        $this->pruneEmptyDirs = $pruneEmptyDirs;
+    }
+
 
 	/**
 	 * @param $skipNewerFiles
@@ -553,6 +576,9 @@ class Rsync extends AbstractProtocol
 
 		if(!$this->archive && $this->recursive)
 			$command->addOption("r");
+
+		if($this->pruneEmptyDirs)
+			$command->addArgument('prune-empty-dirs');
 
 		if(!is_null($this->ssh))
 		{
