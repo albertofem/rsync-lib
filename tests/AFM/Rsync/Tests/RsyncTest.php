@@ -198,6 +198,17 @@ class RsyncTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testRsyncWithPruneEmptyDIrs()
+	{
+		$rsync = new Rsync();
+		$rsync->setPruneEmptyDirs(true);
+
+		$expected = "/usr/bin/rsync -La --prune-empty-dirs /origin /target";
+		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function getTargetDir()
 	{
 		return self::$targetDir;
