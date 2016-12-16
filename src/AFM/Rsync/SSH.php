@@ -57,6 +57,8 @@ class SSH extends AbstractProtocol
 		$this->setOption($options, 'port', 'setPort');
 		$this->setOption($options, 'username', 'setUsername');
 		$this->setOption($options, 'public_key', 'setPublicKey');
+        $this->setOption($options, 'strict_host_key_checking', 'setStrictHostKeyChecking');
+        $this->setOption($options, 'user_known_hosts_file', 'setUserKnownHostFile');
 	}
 
 	/**
@@ -132,6 +134,46 @@ class SSH extends AbstractProtocol
 		return $this->username;
 	}
 
+    /**
+     * @param $string
+     * @throws \InvalidArgumentException
+     */
+    public function setStrictHostKeyChecking($strictHostKeyCheking)
+    {
+        //dd($strictHostKeyCheking);
+        if ($strictHostKeyCheking !== 'yes' && $strictHostKeyCheking !== 'no')
+            throw new \InvalidArgumentException("StrictHostKeyCheking must be set to 'yes' or 'no'");
+
+        $this->strictHostKeyCheking = "StrictHostKeyChecking={$strictHostKeyCheking}";
+    }
+
+    /**
+     * @return $string
+     */
+    public function getStrictHostKeyChecking($strictHostKeyCheking)
+    {
+        return $this->strictHostKeyCheking;
+    }
+
+    /**
+     * @param $string
+     */
+    public function setUserKnownHostFile($userKnownHostsFile)
+    {
+        if (!is_string($userKnownHostsFile))
+            throw new \InvalidArgumentException("UserKnownHostsFile should be set to a directory");
+
+        $this->userKnownHostsFile = "UserKnownHostsFile={$userKnownHostsFile}";
+    }
+
+    /**
+     * @return $string
+     */
+    public function getUserKnownHostFile($userKnownHostFile)
+    {
+        return $this->userKnownHostFile;
+    }
+
 	/**
 	 * Gets commands for this SSH connection
 	 *
@@ -156,6 +198,12 @@ class SSH extends AbstractProtocol
 
 		if(!is_null($this->publicKey))
 			$command->addArgument("i", $this->publicKey);
+
+        if (!is_null($this->strictHostKeyCheking))
+            $command->addArgument("o", $this->strictHostKeyCheking);
+
+        if (!is_null($this->userKnownHostsFile))
+            $command->addArgument("o", $this->userKnownHostsFile);
 
 		if($hostConnection)
 			$command->addParameter($this->getHostConnection());
