@@ -10,12 +10,20 @@ Requirements
 
 This library requires PHP >=5.4
 
+Changelog
+----
+
+01-13-2018
+
+* Dropped PHP 5.3 support
+* Rename `public_key` option to the correct `private_key` one. Old one still works and will be deprecated in version 2.0
+
 Installation
 --------
 
 Require it in composer:
 
-    composer require albertofem/rsync-lib dev-master
+    composer require albertofem/rsync-lib ~1.0
 
 Install it:
 
@@ -55,7 +63,7 @@ $target = "/target/dir";
 $config = array(
     'delete_from_target' => true, 
     'ssh' => array(
-        'host' => myhost.com, 
+        'host' => 'myhost.com', 
         'private_key' => '/my/key'
     )
 );
