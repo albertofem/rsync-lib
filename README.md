@@ -8,7 +8,7 @@ A simple PHP rsync wrapper library
 Requirements
 ----
 
-This library requires PHP >=5.3
+This library requires PHP >=5.4
 
 Installation
 --------
