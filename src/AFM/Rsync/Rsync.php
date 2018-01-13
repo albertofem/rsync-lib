@@ -159,9 +159,7 @@ class Rsync extends AbstractProtocol
      */
     public function setSshOptions($options)
     {
-        if (is_null($this->ssh)) {
-            $this->ssh = new SSH($options);
-        }
+        $this->ssh = new SSH($options);
     }
 
     /**

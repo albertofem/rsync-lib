@@ -4,6 +4,9 @@ before_script:
   - curl -s http://getcomposer.org/installer | php
   - php composer.phar install --dev
 
+script:
+  - script/ci-run.sh
+
 php:
   - 5.4
   - 5.5
