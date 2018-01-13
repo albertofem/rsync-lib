@@ -15,207 +15,250 @@ use AFM\Rsync\Rsync;
 
 class RsyncTest extends \PHPUnit_Framework_TestCase
 {
-	private static $targetDir;
+    private static $targetDir;
 
-	private static $sourceDir;
+    private static $sourceDir;
 
-	public function setUp()
-	{
-		@rrmdir(self::$targetDir);
-	}
+    public function setUp()
+    {
+        @rrmdir(self::$targetDir);
+    }
 
-	public static function setUpBeforeClass()
-	{
-		self::$sourceDir = __DIR__ . '/dir1';
-		self::$targetDir = __DIR__ . '/dir2';
+    public static function setUpBeforeClass()
+    {
+        self::$sourceDir = __DIR__.'/dir1';
+        self::$targetDir = __DIR__.'/dir2';
 
-		@mkdir(self::$targetDir);
-	}
+        @mkdir(self::$targetDir);
+    }
 
-	public static function tearDownAfterClass()
-	{
-		@rrmdir(self::$targetDir);
-	}
+    public static function tearDownAfterClass()
+    {
+        @rrmdir(self::$targetDir);
+    }
 
-	public function testValidExecutableLocation()
-	{
-		$rsync = new Rsync;
-		$rsync->setExecutable("/usr/bin/rsync");
+    public function testValidExecutableLocation()
+    {
+        $rsync = new Rsync;
+        $rsync->setExecutable("/usr/bin/rsync");
 
-		$this->assertTrue(true);
-	}
+        $this->assertTrue(true);
+    }
 
-	/**
- 	 * @expectedException \InvalidArgumentException
-	 */
-	public function testInvalidExecutableLocation()
-	{
-		$rsync = new Rsync;
-		$rsync->setExecutable("/usr/not/exists/rsync!!");
-	}
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidExecutableLocation()
+    {
+        $rsync = new Rsync;
+        $rsync->setExecutable("/usr/not/exists/rsync!!");
+    }
 
-	public function testFollowSymlinkOptions()
-	{
-		$rsync = new Rsync(array('follow_symlinks' => true));
+    public function testFollowSymlinkOptions()
+    {
+        $rsync = new Rsync(array('follow_symlinks' => true));
 
-		$this->assertTrue($rsync->getFollowSymLinks());
-	}
+        $this->assertTrue($rsync->getFollowSymLinks());
+    }
 
-	public function testBasicSync()
-	{
-		$rsync = new Rsync;
+    public function testBasicSync()
+    {
+        $rsync = new Rsync;
 
-		$rsync->sync($this->getSourceDir() . "/*", $this->getTargetDir());
+        $rsync->sync($this->getSourceDir()."/*", $this->getTargetDir());
 
-		$this->assertTrue(compare_directories($this->getSourceDir(), $this->getTargetDir()));
-	}
+        $this->assertTrue(compare_directories($this->getSourceDir(), $this->getTargetDir()));
+    }
 
-	public function testRsyncWithSSHConnection()
-	{
-		$config = array(
-			'ssh' => array(
-				'username' => 'test',
-				'host' => 'test.com',
-				'port' => 2342
-			)
-		);
+    public function testRsyncWithSSHConnection()
+    {
+        $user = getenv('USER') ?: 'test_no_ssh_server';
+        $targetBaseDir = getenv('HOME') ?: '/home';
 
-		$rsync = new Rsync($config);
+        $config = array(
+            'ssh' => array(
+                'username' => $user,
+                'host' => 'localhost',
+                'port' => 2222,
+            ),
+        );
 
-		$command = $rsync->getCommand(".", "/home/test/");
+        $rsync = new Rsync($config);
 
-		$actual = $command->getCommand();
-		$expected = "/usr/bin/rsync -La --rsh 'ssh -p '2342'' . test@test.com:/home/test/";
+        $command = $rsync->getCommand(".", $targetBaseDir."/test/");
 
-		$this->assertEquals($expected, $actual);
+        $actual = $command->getCommand();
+        $expected = "/usr/bin/rsync -La --rsh 'ssh -p '2222'' . ".$user."@localhost:".$targetBaseDir."/test/";
 
-		$this->markTestIncomplete("Tested SSH connection string, but cannot test real SSH connection sync!");
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testRsyncWithSingleExclude()
-	{
-		$rsync = new Rsync();
-		$rsync->setExclude(array('exclude1'));
+    public function testRsyncWithRealSSHConnection()
+    {
+        $user = getenv('USER');
+        $targetBaseDir = getenv('HOME');
+        $sshKey = $targetBaseDir.'/.ssh/id_rsa_rsync_test';
 
-		$expected = "/usr/bin/rsync -La --exclude 'exclude1' /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+        if (!file_exists($sshKey)) {
+            $this->markTestIncomplete('Cannot perform real SSH rsync due to missing SSH configuration');
+        }
 
-		$this->assertEquals($expected, $actual);
-	}
+        $config = array(
+            'ssh' => array(
+                'username' => $user,
+                'host' => 'localhost',
+                'port' => 2222,
+                'private_key' => $sshKey,
+            ),
+        );
 
-	public function testRsyncWithMultipleExcludes()
-	{
-		$rsync = new Rsync();
-		$rsync->setExclude(array('exclude1', 'exclude2', 'exclude3'));
+        $rsync = new Rsync($config);
+        $rsync->sync($this->getSourceDir()."/*", $this->getTargetDir());
 
-		$expected = "/usr/bin/rsync -La --exclude 'exclude1' --exclude 'exclude2' --exclude 'exclude3' /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+        $this->assertTrue(compare_directories($this->getSourceDir(), $this->getTargetDir()));
+    }
 
-		$this->assertEquals($expected, $actual);
-	}
+    public
+    function testRsyncWithSingleExclude()
+    {
+        $rsync = new Rsync();
+        $rsync->setExclude(array('exclude1'));
 
-	public function testRsyncWithExcludeFrom()
-	{
-		$rsync = new Rsync();
-		$rsync->setExcludeFrom('rsync_exclude.txt');
+        $expected = "/usr/bin/rsync -La --exclude 'exclude1' /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-		$expected = "/usr/bin/rsync -La --exclude-from 'rsync_exclude.txt' /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+        $this->assertEquals($expected, $actual);
+    }
 
-		$this->assertEquals($expected, $actual);
-	}
+    public
+    function testRsyncWithMultipleExcludes()
+    {
+        $rsync = new Rsync();
+        $rsync->setExclude(array('exclude1', 'exclude2', 'exclude3'));
 
-	public function testRsyncWithTimes()
-	{
-		$rsync = new Rsync();
-		$rsync->setTimes(true);
+        $expected = "/usr/bin/rsync -La --exclude 'exclude1' --exclude 'exclude2' --exclude 'exclude3' /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-		$expected = "/usr/bin/rsync -La --times /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+        $this->assertEquals($expected, $actual);
+    }
 
-		$this->assertEquals($expected, $actual);
-	}
+    public
+    function testRsyncWithExcludeFrom()
+    {
+        $rsync = new Rsync();
+        $rsync->setExcludeFrom('rsync_exclude.txt');
 
-	public function testRsyncWithCompression()
-	{
-		$rsync = new Rsync();
-		$rsync->setCompression(true);
+        $expected = "/usr/bin/rsync -La --exclude-from 'rsync_exclude.txt' /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-		$expected = "/usr/bin/rsync -Lza /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+        $this->assertEquals($expected, $actual);
+    }
 
-		$this->assertEquals($expected, $actual);
-	}
+    public
+    function testRsyncWithTimes()
+    {
+        $rsync = new Rsync();
+        $rsync->setTimes(true);
 
-	public function testRsyncWithOptionalParametersArray()
-	{
-		$rsync = new Rsync();
-		$rsync->setOptionalParameters(array('z', 'p'));
+        $expected = "/usr/bin/rsync -La --times /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-		$expected = "/usr/bin/rsync -Lzpa /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function testRsyncWithOptionalParametersString()
-	{
-		$rsync = new Rsync();
-		$rsync->setOptionalParameters('zp');
+    public
+    function testRsyncWithCompression()
+    {
+        $rsync = new Rsync();
+        $rsync->setCompression(true);
 
-		$expected = "/usr/bin/rsync -Lzpa /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
-	}
+        $expected = "/usr/bin/rsync -Lza /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-	public function testRsyncWithInfo()
-	{
-		$rsync = new Rsync();
-		$rsync->setInfo('all0');
+        $this->assertEquals($expected, $actual);
+    }
 
-		$expected = "/usr/bin/rsync -La --info 'all0' /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+    public
+    function testRsyncWithOptionalParametersArray()
+    {
+        $rsync = new Rsync();
+        $rsync->setOptionalParameters(array('z', 'p'));
 
-		$this->assertEquals($expected, $actual);
-	}
+        $expected = "/usr/bin/rsync -Lzpa /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-	public function testRsyncWithCompareDest()
-	{
-		$rsync = new Rsync();
-		$rsync->setCompareDest('/Path/To/File');
+        $this->assertEquals($expected, $actual);
+    }
 
-		$expected = "/usr/bin/rsync -La --compare-dest '/Path/To/File' /origin /target";
-		$actual   = $rsync->getCommand('/origin', '/target')->getCommand();
+    public
+    function testRsyncWithOptionalParametersString()
+    {
+        $rsync = new Rsync();
+        $rsync->setOptionalParameters('zp');
 
-		$this->assertEquals($expected, $actual);
-	}
+        $expected = "/usr/bin/rsync -Lzpa /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-	public function testRsyncWithRemoveSourceFile()
-	{
-		$rsync = new Rsync();
-		$rsync->setRemoveSource(true);
+        $this->assertEquals($expected, $actual);
+    }
 
-		$expected = "/usr/bin/rsync -La --remove-source-files /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+    public
+    function testRsyncWithInfo()
+    {
+        $rsync = new Rsync();
+        $rsync->setInfo('all0');
 
-		$this->assertEquals($expected, $actual);
-	}
+        $expected = "/usr/bin/rsync -La --info 'all0' /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-	public function testRsyncWithPruneEmptyDIrs()
-	{
-		$rsync = new Rsync();
-		$rsync->setPruneEmptyDirs(true);
+        $this->assertEquals($expected, $actual);
+    }
 
-		$expected = "/usr/bin/rsync -La --prune-empty-dirs /origin /target";
-		$actual = $rsync->getCommand('/origin', '/target')->getCommand();
+    public
+    function testRsyncWithCompareDest()
+    {
+        $rsync = new Rsync();
+        $rsync->setCompareDest('/Path/To/File');
 
-		$this->assertEquals($expected, $actual);
-	}
+        $expected = "/usr/bin/rsync -La --compare-dest '/Path/To/File' /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
 
-	public function getTargetDir()
-	{
-		return self::$targetDir;
-	}
+        $this->assertEquals($expected, $actual);
+    }
 
-	public function getSourceDir()
-	{
-		return self::$sourceDir;
-	}
+    public
+    function testRsyncWithRemoveSourceFile()
+    {
+        $rsync = new Rsync();
+        $rsync->setRemoveSource(true);
+
+        $expected = "/usr/bin/rsync -La --remove-source-files /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public
+    function testRsyncWithPruneEmptyDIrs()
+    {
+        $rsync = new Rsync();
+        $rsync->setPruneEmptyDirs(true);
+
+        $expected = "/usr/bin/rsync -La --prune-empty-dirs /origin /target";
+        $actual = $rsync->getCommand('/origin', '/target')->getCommand();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public
+    function getTargetDir()
+    {
+        return self::$targetDir;
+    }
+
+    public
+    function getSourceDir()
+    {
+        return self::$sourceDir;
+    }
 }
