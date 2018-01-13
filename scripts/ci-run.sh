@@ -6,7 +6,7 @@ cat > ~/sshd/sshd_config <<-EOF
 	Port 2222
 	ListenAddress 0.0.0.0
 	Protocol 2
-	HostKey ${HOME}/sshd/id_rsa
+	HostKey ${HOME}/sshd/id_rsa_rsync_test
 	PidFile ${HOME}/sshd/pid
 	PasswordAuthentication yes
 	PubkeyAuthentication yes
