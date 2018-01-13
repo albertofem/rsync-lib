@@ -23,7 +23,7 @@ Installation
 
 Require it in composer:
 
-    composer require albertofem/rsync-lib ~1.0
+    composer require albertofem/rsync-lib 1.0.0
 
 Install it:
 
