@@ -1,27 +1,31 @@
 {
-	"name": "albertofem/rsync-lib",
-	"description": "A simple PHP rsync wrapper library",
-	"keywords": ["rsync library"],
-	"homepage": "http://albertofem.com",
-	"license": "MIT",
-	"authors": [
-		{
-			"name": "Alberto Fernandez",
-			"email": "albertofem@gmail.com"
-		}
-	],
-	"require": {
-		"php": ">=5.3.3"
-	},
-    "require-dev": {
-        "phpunit/phpunit":"~4.1"
-    },
-	"autoload": {
-		"psr-0": { "AFM": "src/" }
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "1.0.x-dev"
-		}
-	}
+  "name": "albertofem/rsync-lib",
+  "description": "A simple PHP rsync wrapper library",
+  "keywords": [
+    "rsync library"
+  ],
+  "homepage": "http://albertofem.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alberto Fernandez",
+      "email": "albertofem@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": ">=4.0,<6"
+  },
+  "autoload": {
+    "psr-0": {
+      "AFM": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
 }
