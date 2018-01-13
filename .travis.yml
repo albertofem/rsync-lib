@@ -5,7 +5,7 @@ before_script:
   - php composer.phar install --dev
 
 script:
-  - script/ci-run.sh
+  - scripts/ci-run.sh
 
 php:
   - 5.4
