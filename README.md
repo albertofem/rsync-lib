@@ -75,3 +75,31 @@ $rsync->setFollowSymlinks(false);
 
 $rsync->sync($origin, $target);
 ```
+
+
+Options
+---------
+
+| Construct options  | Rsync argument            | Comment                                          |
+| ------------------ | ------------------------- | ------------------------------------------------ |
+| executable         |                           | path of rsync (default: `/usr/bin/rsync`)        |
+| archive            | -a, --archive             | archive mode; equals -rlptgoD (no -H,-A,-X)      |
+| update             | -u, --update              | skip files that are newer on the receiver        |
+| follow_symlinks    | -L, --copy-links          | transform symlink into referent file/dir         |
+| dry_run            | -n, --dry-run             | perform a trial run with no changes made         |
+| option_parameters  |                           | add any optional options we've specified         |
+| verbose            | -v, --verbose             | increase verbosity                               |
+| delete_from_target |     --delete              | delete extraneous files from destination dirs    |
+| delete_excluded    |     --delete-excluded     | also delete excluded files from destination dirs |
+| exclude            |     --exclude=PATTERN     | exclude files matching PATTERN                   |
+| excludeFrom        |     --exclude-from=FILE   | read exclude patterns from FILE                  |
+| recursive          | -r, --recursive           | recurse into directories                         |
+| times              | -t, --times               | preserve modification times                      |
+| show_output        |                           | execute and buffers command result to print it   |
+| ssh                |                           | set ssh options                                  |
+| compression        | -z, --compress            | compress file data during the transfer           |
+| remote_origin      |                           | use ssh for origin path                          |
+| remove_source      |     --remove-source-files | sender removes synchronized files (non-dirs)     |
+| info               |     --info=FLAGS          | fine-grained informational verbosity             |
+| compare_dest       |     --compare-dest=DIR    | also compare destination files relative to DIR   |
+| prune_empty_dirs   | -m, --prune-empty-dirs    | prune empty directory chains from the file-list  |
