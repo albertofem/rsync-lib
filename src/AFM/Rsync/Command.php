@@ -50,6 +50,21 @@ class Command
     private $parameters = array();
 
     /**
+     * @var int|null
+     */
+    private $exitCode;
+
+    /**
+     * @var string
+     */
+    private $stderr;
+
+    /**
+     * @var string
+     */
+    private $stdout;
+
+    /**
      * Every command must have an executable
      *
      * @param $executable
@@ -188,7 +203,7 @@ class Command
         if ($showOutput) {
             $this->executeWithOutput();
         } else {
-            shell_exec($this->command);
+            $this->executeWithoutOutput();
         }
     }
 
@@ -209,5 +224,70 @@ class Command
         } else {
             throw new \InvalidArgumentException("Cannot execute command: '".$this->command."'");
         }
+    }
+
+    /**
+     * Execute and save command result to property
+     *
+     * @throws \InvalidArgumentException When the command couldn't be executed
+     */
+    private function executeWithoutOutput()
+    {
+        $this->exitCode = 1;    // exit 0 on ok
+        $this->stdout   = '';   // output of the command
+        $this->stderr   = '';   // errors during execution
+
+        $descriptor = [
+            0 => ["pipe", "r"],    // stdin is a pipe that the child will read from
+            1 => ["pipe", "w"],    // stdout is a pipe that the child will write to
+            2 => ["pipe", "w"]     // stderr is a pipe
+        ];
+
+        $proc = proc_open($this->command, $descriptor, $pipes);
+
+        if ($proc === false) {
+            throw new \InvalidArgumentException("Cannot execute command: '".$this->command."'");
+        }
+
+        $this->stdout = trim(stream_get_contents($pipes[1]));
+        $this->stderr = trim(stream_get_contents($pipes[2]));
+
+        fclose($pipes[0]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        $this->exitCode = proc_close($proc);
+
+        return $this;
+    }
+
+    /**
+     * Return the last command execution exitCode, null if command hasn't been executed yet
+     *
+     * @return string|null
+     */
+    public function getExitCode()
+    {
+        return $this->exitCode;
+    }
+
+    /**
+     * Return the last command execution stderr, null if command hasn't been executed yet
+     *
+     * @return string|null
+     */
+    public function getStderr()
+    {
+        return $this->stderr;
+    }
+
+    /**
+     * Return the last command execution stdout, null if command hasn't been executed yet
+     *
+     * @return string|null
+     */
+    public function getStdout()
+    {
+        return $this->stdout;
     }
 }
