@@ -76,6 +76,31 @@ $rsync->setFollowSymlinks(false);
 $rsync->sync($origin, $target);
 ```
 
+Used errors & output
+
+```php
+<?php
+
+use AFM\Rsync\Rsync;
+
+$origin = __DIR__;
+$target = "/target/dir/";
+
+$rsync = new Rsync;
+
+$rsync->setShowOutput(false);
+
+$command = $rsync->sync($origin, $target);
+
+$result = $command->exitCode();
+if (0 == $result) {
+    print "Success!\nDetails:\n";
+    print $command->getStdout() . "\n";
+} else {
+    print "Error No {$result}: " . $command->getStderr() . "\n";
+}
+```
+
 
 Options
 ---------

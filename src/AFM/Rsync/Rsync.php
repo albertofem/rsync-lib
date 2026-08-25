@@ -170,6 +170,8 @@ class Rsync extends AbstractProtocol
      * @param $origin
      * @param $target
      *
+     * @return Command
+     *
      * @throws \InvalidArgumentException If the command failed
      */
     public function sync($origin, $target)
@@ -177,6 +179,8 @@ class Rsync extends AbstractProtocol
         $command = $this->getCommand($origin, $target);
 
         $command->execute($this->showOutput);
+
+        return $command;
     }
 
     /**
