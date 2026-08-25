@@ -504,6 +504,9 @@ class Rsync extends AbstractProtocol
      */
     public function getCommand($origin, $target)
     {
+        if ($this->isRemotePath($origin) && $this->isRemotePath($target)) {
+            throw new \InvalidArgumentException("The source and destination cannot both be remote.");
+        }
         $command = new Command($this->executable);
 
         if ($this->skipNewerFiles) {
@@ -605,5 +608,16 @@ class Rsync extends AbstractProtocol
         }
 
         return $command;
+    }
+
+    /**
+     * Checks if a path is a remote path (contains user@host or host:)
+     *
+     * @param $path
+     * @return bool
+     */
+    private function isRemotePath($path)
+    {
+        return strpos($path, ':') !== false && !preg_match('/^[a-zA-Z]:/', $path);
     }
 }
